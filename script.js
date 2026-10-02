@@ -1,3 +1,118 @@
+// ---- Translations ----
+const TRANSLATIONS = {
+  en: {
+    pageTitle: "Brizall catalogue",
+    formTitle: "Get instant access",
+    formSub: "Tell us where to reach you",
+    nameLabel: "Name",
+    namePlaceholder: "Jane Doe",
+    emailLabel: "Email",
+    emailPlaceholder: "jane@example.com",
+    phoneLabel: "Phone number",
+    phonePlaceholder: "Phone number",
+    continue: "Continue",
+    submitting: "Submitting…",
+    downloadTitle: "Your download is ready",
+    thankYou: "Thank you for reaching out! The file is ready when you are.",
+    downloadEn: "Download Catalogue (English)",
+    downloadEs: "Download Catalogue (Spanish)",
+    footNote: "By submitting, you agree to be contacted about this catalogue.",
+    errName: "Enter your name.",
+    errEmail: "Enter a valid email address.",
+    errPhone: "Enter a valid phone number.",
+    errSave: "Something went wrong saving your details. Please try again.",
+  },
+  es: {
+    pageTitle: "Catálogo Brizall",
+    formTitle: "Obtén acceso inmediato",
+    formSub: "Dinos cómo contactarte",
+    nameLabel: "Nombre",
+    namePlaceholder: "María Pérez",
+    emailLabel: "Correo electrónico",
+    emailPlaceholder: "maria@ejemplo.com",
+    phoneLabel: "Número de teléfono",
+    phonePlaceholder: "Número de teléfono",
+    continue: "Continuar",
+    submitting: "Enviando…",
+    downloadTitle: "Tu descarga está lista",
+    thankYou: "¡Gracias por contactarnos! El archivo está listo cuando tú lo estés.",
+    downloadEn: "Descargar catálogo (inglés)",
+    downloadEs: "Descargar catálogo (español)",
+    footNote: "Al enviar, aceptas que te contactemos acerca de este catálogo.",
+    errName: "Ingresa tu nombre.",
+    errEmail: "Ingresa un correo electrónico válido.",
+    errPhone: "Ingresa un número de teléfono válido.",
+    errSave: "Algo salió mal al guardar tus datos. Inténtalo de nuevo.",
+  },
+};
+
+const LANG_STORAGE_KEY = "brizall_lang";
+let currentLang = "en";
+
+function t(key) {
+  return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || TRANSLATIONS.en[key] || key;
+}
+
+function detectInitialLang() {
+  try {
+    const saved = localStorage.getItem(LANG_STORAGE_KEY);
+    if (saved && TRANSLATIONS[saved]) return saved;
+  } catch (e) {
+    /* localStorage unavailable — ignore */
+  }
+  const browser = (navigator.language || "en").toLowerCase();
+  return browser.startsWith("es") ? "es" : "en";
+}
+
+// Re-render any message that was set via a key (errors, form note)
+function renderKeyedMessages() {
+  document.querySelectorAll("[data-msg-key]").forEach((el) => {
+    el.textContent = t(el.dataset.msgKey);
+  });
+}
+
+function setMessage(el, key) {
+  if (key) {
+    el.dataset.msgKey = key;
+    el.textContent = t(key);
+  } else {
+    delete el.dataset.msgKey;
+    el.textContent = "";
+  }
+}
+
+function applyLanguage(lang) {
+  if (!TRANSLATIONS[lang]) lang = "en";
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.title = t("pageTitle");
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    // Don't overwrite the submit label while it's showing "Submitting…"
+    if (el.classList.contains("btnLabel") && submitBtn && submitBtn.disabled) {
+      el.textContent = t("submitting");
+      return;
+    }
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+
+  document.querySelectorAll(".langBtn").forEach((btn) => {
+    btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang));
+  });
+
+  renderKeyedMessages();
+
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch (e) {
+    /* ignore */
+  }
+}
+
 // ---- Phone input (country code selector) ----
 // Wrapped in try/catch so a failed CDN load can't break the whole form.
 let iti = null;
@@ -33,6 +148,12 @@ const nameError = document.getElementById("nameError");
 const emailError = document.getElementById("emailError");
 const phoneError = document.getElementById("phoneError");
 
+// ---- Language toggle wiring ----
+document.querySelectorAll(".langBtn").forEach((btn) => {
+  btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
+});
+applyLanguage(detectInitialLang());
+
 // ---- Validation ----
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
@@ -45,11 +166,10 @@ function isValidPhoneFallback(value) {
 }
 
 function clearErrors() {
-  [nameError, emailError, phoneError].forEach((el) => (el.textContent = ""));
+  [nameError, emailError, phoneError, formNote].forEach((el) => setMessage(el, null));
   [nameInput, emailInput, phoneInput].forEach((el) =>
     el.classList.remove("invalid")
   );
-  formNote.textContent = "";
 }
 
 function validate() {
@@ -57,20 +177,20 @@ function validate() {
   let valid = true;
 
   if (!nameInput.value.trim()) {
-    nameError.textContent = "Enter your name.";
+    setMessage(nameError, "errName");
     nameInput.classList.add("invalid");
     valid = false;
   }
 
   if (!isValidEmail(emailInput.value.trim())) {
-    emailError.textContent = "Enter a valid email address.";
+    setMessage(emailError, "errEmail");
     emailInput.classList.add("invalid");
     valid = false;
   }
 
   const phoneOk = iti ? iti.isValidNumber() : isValidPhoneFallback(phoneInput.value);
   if (!phoneOk) {
-    phoneError.textContent = "Enter a valid phone number.";
+    setMessage(phoneError, "errPhone");
     phoneInput.classList.add("invalid");
     valid = false;
   }
@@ -102,8 +222,9 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validate()) return;
 
+  const btnLabel = submitBtn.querySelector(".btnLabel");
   submitBtn.disabled = true;
-  submitBtn.querySelector(".btnLabel").textContent = "Submitting…";
+  btnLabel.textContent = t("submitting");
 
   const payload = {
     name: nameInput.value.trim(),
@@ -117,9 +238,8 @@ form.addEventListener("submit", async (e) => {
     downloadStep.classList.remove("hidden");
   } catch (err) {
     console.error(err);
-    formNote.textContent =
-      "Something went wrong saving your details. Please try again.";
+    setMessage(formNote, "errSave");
     submitBtn.disabled = false;
-    submitBtn.querySelector(".btnLabel").textContent = "Continue";
+    btnLabel.textContent = t("continue");
   }
 });

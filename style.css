@@ -20,6 +20,46 @@
   z-index: 10;
 }
 
+/* Language toggle (EN / ES) */
+.langToggle{
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  display: inline-flex;
+  padding: 3px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.langBtn{
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.langBtn:hover{ color: var(--ink); }
+
+.langBtn[aria-pressed="true"]{
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.langBtn:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 *{ box-sizing: border-box; }
 
 body{
@@ -133,6 +173,14 @@ button[type="submit"]:disabled{ opacity: 0.6; cursor: default; }
   text-align:center;
 }
 
+/* Download buttons: the one matching the current language is the filled
+   primary button and sits on top; the other is an outlined secondary. */
+.downloadGroup{
+  display:flex;
+  flex-direction:column;
+  gap: 12px;
+}
+
 .downloadBtn{
   display:block;
   text-align:center;
@@ -141,12 +189,33 @@ button[type="submit"]:disabled{ opacity: 0.6; cursor: default; }
   border-radius: 8px;
   background: var(--accent);
   color: var(--accent-ink);
+  border: 1px solid var(--accent);
   font-size: 15px;
   font-weight: 650;
   text-decoration:none;
 }
 
 .downloadBtn:hover{ opacity: 0.9; }
+
+html[lang="en"] #downloadBtnEs,
+html[lang="es"] #downloadBtn{
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+html[lang="en"] #downloadBtnEs:hover,
+html[lang="es"] #downloadBtn:hover{
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+html[lang="es"] #downloadBtnEs{ order: -1; }
+
+.downloadBtn:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* intl-tel-input dropdown — override its light-theme defaults for dark bg */
 .iti__country-list{
@@ -190,6 +259,14 @@ button[type="submit"]:disabled{ opacity: 0.6; cursor: default; }
   color: var(--ink-dim);
   font-size: 12px;
   margin-top: 18px;
+}
+
+/* Small screens: keep logo + toggle from crowding the card */
+@media (max-width: 480px){
+  .logo{ top: 16px; left: 16px; height: 28px; }
+  .langToggle{ top: 14px; right: 16px; }
+  body{ padding-top: 72px; }
+  .card{ padding: 32px 24px; }
 }
 
 @media (prefers-reduced-motion: no-preference){

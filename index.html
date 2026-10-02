@@ -11,29 +11,35 @@
 
   <img src="assets/logo.png" alt="Brizall" class="logo">
 
+  <!-- Language toggle -->
+  <div class="langToggle" role="group" aria-label="Language / Idioma">
+    <button type="button" class="langBtn" data-lang="en" aria-pressed="true">EN</button>
+    <button type="button" class="langBtn" data-lang="es" aria-pressed="false">ES</button>
+  </div>
+
   <main class="wrap">
     <div class="card" id="card">
 
       <!-- STEP 1: FORM -->
       <section id="formStep" class="step">
-        <h1>Get instant access</h1>
-        <p class="sub">Tell us where to reach you</p>
+        <h1 data-i18n="formTitle">Get instant access</h1>
+        <p class="sub" data-i18n="formSub">Tell us where to reach you</p>
 
         <form id="leadForm" novalidate>
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" placeholder="Jane Doe" autocomplete="name" required>
+          <label for="name" data-i18n="nameLabel">Name</label>
+          <input type="text" id="name" name="name" placeholder="Jane Doe" data-i18n-placeholder="namePlaceholder" autocomplete="name" required>
           <span class="error" id="nameError"></span>
 
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" required>
+          <label for="email" data-i18n="emailLabel">Email</label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" data-i18n-placeholder="emailPlaceholder" autocomplete="email" required>
           <span class="error" id="emailError"></span>
 
-          <label for="phone">Phone number</label>
-          <input type="tel" id="phone" name="phone" placeholder="Phone number" autocomplete="tel" required>
+          <label for="phone" data-i18n="phoneLabel">Phone number</label>
+          <input type="tel" id="phone" name="phone" placeholder="Phone number" data-i18n-placeholder="phonePlaceholder" autocomplete="tel" required>
           <span class="error" id="phoneError"></span>
 
           <button type="submit" id="submitBtn">
-            <span class="btnLabel">Continue</span>
+            <span class="btnLabel" data-i18n="continue">Continue</span>
           </button>
           <p class="formNote" id="formNote"></p>
         </form>
@@ -41,13 +47,16 @@
 
       <!-- STEP 2: DOWNLOAD -->
       <section id="downloadStep" class="step hidden">
-        <h1>Your download is ready</h1>
-        <p class="sub" id="thankYouMsg">Thank you for reaching out! the file is ready when you are.</p>
-        <a href="assets/Brizall_Catlogue.pdf" download class="downloadBtn" id="downloadBtn">Download Catalogue</a>
+        <h1 data-i18n="downloadTitle">Your download is ready</h1>
+        <p class="sub" id="thankYouMsg" data-i18n="thankYou">Thank you for reaching out! The file is ready when you are.</p>
+        <div class="downloadGroup">
+          <a href="assets/Brizall_Catlogue.pdf" download class="downloadBtn" id="downloadBtn" data-i18n="downloadEn">Download Catalogue (English)</a>
+          <a href="assets/Brizall_Catlogue_Spanish.pdf" download class="downloadBtn" id="downloadBtnEs" data-i18n="downloadEs">Download Catalogue (Spanish)</a>
+        </div>
       </section>
 
     </div>
-    <p class="footNote">By submitting, you agree to be contacted about this catalogue.</p>
+    <p class="footNote" data-i18n="footNote">By submitting, you agree to be contacted about this catalogue.</p>
   </main>
 
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
